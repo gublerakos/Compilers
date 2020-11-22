@@ -47,8 +47,17 @@
 #define T_ASSIGN 192
 #define T_LBRACK 193
 #define T_RBRACK 194
-#define T_EOF 195
+// T_EOF = 0 because yylex returns 0 when finds eof.
+#define T_EOF 0
 #define T_STRINGS 198
 #define T_COMMENT 159
 #define T_INOP 181
 #define MAX_SIZE 100
+#define MAX_LINE_SIZE 100
+
+// ERRORS
+
+// #define COMMENT_ERROR 0
+// #define NEWLINE_ERROR 1
+// #define STRING_ERROR 2
+#define MAX_ERRORS 5
