@@ -1,22 +1,40 @@
+/*Flex file to implement lectical analyser for pasc500.*/
+/*Authors: Mizaras Fokion(2574), Pantazi-Kypraiou Maria(2596), Poulianou Xaidw(2613)*/
+/*Date: 25/11/2020 */
+
 %option case-insensitive
 %option noyywrap
+
+/* Libraries, declaration of variables and functions' prototypes. */
 %{
 	#include <stdio.h>
 	#include <string.h>
 	#include <stdlib.h>
 	#include <math.h>
 	#include "tokens.h"
-
+	
+	// Flag for EOF. 
 	int eof = 0;
+
+	// Counter for lines.
 	int lines = 1;
+
+	// Counter for errors. When MAX_ERRORS (= 5) is reached program terminates.
 	int errors = 0;
-	int error_type = -1;
+
+	// Buffer to store strings.
 	char str_buffer[MAX_SIZE];
-	char line_buffer[MAX_LINE_SIZE];
 	char *str_ptr;
+
+	// Buffer to store whole input line to print in case of error.
+	char line_buffer[MAX_LINE_SIZE];
+
 	void yyerror(char* message);
+	
+	// File descriptor to opening file.
 	FILE* fd;
 	FILE* fd_help;
+
 	void error_line();
 
 	// yytext conversion from string to int
@@ -29,25 +47,29 @@
 	double hex_to_real(char* str);
 	double bin_to_real(char*str);
 %}
+
 WHITESPACE [ \t]*
 ID \_?[A-Z][A-Z0-9\_]*[A-Z0-9]|\_?[A-Z]
-/******         ICONST VALUES ******************/
 
+/************* ICONST VALUES *************/
 BICONST (0B)[1][01]*
 HICONST (0H)[A-F1-9][A-F0-9]*
 ICONST 0|[1-9][0-9]*
-/******         RCONST VALUES ******************/
+
+/************* RCONST VALUES *************/
 BRCONST [0][B][1][01]*\.[01]*
 HRCONST [0][H][A-F0-9]*\.[0-9A-F]*
 RCONST_EXP 0|([1-9][0-9]*)?\.(0|[1-9]+[0-9]*)E(0|[-+]?(0|[1-9]+[0-9]*))|(0|[1-9][0-9]*)E(0|[-+]?(0|[1-9]+[0-9]*))
 RCONST_NOEXP 0|[1-9][0-9]*\.0|[1-9]*\.[1-9]+[0-9]*
 
 
-
+/************* CCONST VALUES *************/
 CCONST \'.\'|\'\\[nfrtv]\'
+
 %x COMMENT
 %x STRINGS
 
+/************* KEYWORD VALUES *************/
 %%
 "PROGRAM" 				{printf("yytext = %s  and token = %d in line %d\n", yytext,   T_PROGRAM, lines);
 	                    return T_PROGRAM;}
@@ -145,6 +167,8 @@ CCONST \'.\'|\'\\[nfrtv]\'
 {CCONST}				{printf("yytext = %s and token = %d in line %d\n", yytext,   T_CCONST, lines);
 	                    return T_CCONST;}
 
+ /************* OPERATOR VALUES *************/
+
 "*"|"/" 				{printf("yytext = %s  and token = %d in line %d\n", yytext,   T_MULDIVANDOP, lines);
 	                    return T_MULDIVANDOP;}
 
@@ -152,6 +176,8 @@ CCONST \'.\'|\'\\[nfrtv]\'
 	                    return T_RELOP;}
 "-"|"+" 				{printf("yytext = %s  and token = %d in line %d\n", yytext,   T_ADDOP, lines);
 	                    return T_ADDOP;}
+
+ /************* OTHER VERBAL UNITS VALUES *************/						
 
 "(" 					{printf("yytext = %s  and token = %d in line %d\n", yytext,   T_LPAREN, lines);
 	                    return T_LPAREN;}
@@ -181,6 +207,7 @@ CCONST \'.\'|\'\\[nfrtv]\'
 <INITIAL><<EOF>> 		{printf("EOF FOUND with token = %d in line %d\n", T_EOF, lines);
 	                    return T_EOF;}
 
+ /************* STATE FOR STRINGS AND SUBCASES *************/
 \"						{str_ptr = str_buffer; BEGIN(STRINGS);}
 <STRINGS><<EOF>>		{yyerror("Unterminated string"); yyterminate();}
 <STRINGS>\"				{BEGIN(INITIAL); *str_ptr = '\0'; 
@@ -201,6 +228,7 @@ CCONST \'.\'|\'\\[nfrtv]\'
 <STRINGS>[\\]. 			*str_ptr++ = yytext[1];
 
 
+ /************* STATE FOR COMMENTS AND SUBCASES *************/
 "{"	BEGIN(COMMENT);
 <COMMENT><<EOF>>		{yyerror("Unterminated comment"); yyterminate();}
 <COMMENT>[^}\n]* 		{return T_COMMENT;}
@@ -213,6 +241,7 @@ CCONST \'.\'|\'\\[nfrtv]\'
 
 %%
 
+// Function to increase number of errors, when found, and print the corresponding line.
 void yyerror(char* message){
 	errors++;
 	printf("(#%d) errors \"%s\" at token  in line (%d): %s\n", errors, message, lines, line_buffer);
@@ -222,6 +251,7 @@ void yyerror(char* message){
 	}
 }
 
+// Function to store most recent line in "line_buffer".
 void error_line(){
 	char c;
 	int i;
@@ -293,8 +323,7 @@ double bin_to_real(char* str){
 	return(res);
 }
 
-
-
+// Main function that opens the file(given as argument) and reads it until EOF or MAX_ERRORS.
 int main(int argc, char* argv[]){
 	int token;
 
@@ -320,9 +349,6 @@ int main(int argc, char* argv[]){
 	 	token = yylex();
 	} while(token != T_EOF);
     
-	//token = yylex();
-    //token = yylex();
-    //printf("%s, %d, %d", yytext, bin_to_int(yytext), token);
 	fclose(fd);
 	fclose(fd_help);
 	yyterminate();

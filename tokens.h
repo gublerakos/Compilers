@@ -1,3 +1,5 @@
+// Tokens based on the transition diagram of lectical analyser.
+
 #define T_ID 140
 #define T_PROGRAM 8
 #define T_CONST 14

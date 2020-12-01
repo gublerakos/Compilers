@@ -1,9 +1,9 @@
-all: lex.yy.c compiler
+all: lex.yy.c lecticalAnalyser
 
 ########################### compiler ###########################
 
-compiler: 	lex.yy.c tokens.h
-			gcc lex.yy.c -o compiler -lfl -lm
+lecticalAnalyser: 	lex.yy.c tokens.h
+			gcc lex.yy.c -o lecticalAnalyser -lfl -lm
 
 ########################### lex.yy.c ###########################
 
