@@ -72,8 +72,22 @@
     #define YYSTYPE double
     #include <stdio.h>
     #include <math.h>
+    #include "hashtbl.h"
 
-#line 77 "syntaxAnalyser.tab.c"
+
+    HASHTBL *hashtbl;
+    int scope = 0;
+
+    extern FILE* fd;
+	extern FILE* fd_help;
+
+    extern int yylex();
+    // extern FILE *yyin;
+    extern int yylineno;
+
+    void yyerror(char* message);
+
+#line 91 "syntaxAnalyser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -579,18 +593,18 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    41,    41,    43,    45,    47,    48,    50,    51,    53,
-      54,    55,    56,    57,    58,    59,    60,    61,    62,    63,
-      64,    65,    67,    68,    69,    71,    72,    74,    75,    76,
-      77,    79,    80,    82,    83,    85,    86,    88,    89,    91,
-      92,    94,    95,    96,    97,    98,   100,   101,   103,   104,
-     106,   107,   108,   109,   110,   111,   113,   114,   116,   117,
-     118,   119,   121,   122,   124,   126,   127,   129,   130,   132,
-     133,   135,   136,   138,   139,   141,   142,   143,   145,   146,
-     148,   149,   151,   152,   154,   156,   157,   159,   160,   161,
-     162,   163,   164,   165,   166,   167,   169,   170,   173,   174,
-     177,   179,   181,   182,   184,   186,   187,   189,   190,   192,
-     193,   195,   197,   198,   200,   201
+       0,    55,    55,    57,    59,    61,    62,    64,    65,    67,
+      68,    69,    70,    71,    72,    73,    74,    75,    76,    77,
+      78,    79,    81,    82,    83,    85,    86,    88,    89,    90,
+      91,    93,    94,    96,    97,    99,   100,   102,   103,   105,
+     106,   108,   109,   110,   111,   112,   114,   115,   117,   118,
+     120,   121,   122,   123,   124,   125,   127,   128,   130,   131,
+     132,   133,   135,   136,   138,   140,   141,   143,   144,   146,
+     147,   149,   150,   152,   153,   155,   156,   157,   159,   160,
+     162,   163,   165,   166,   168,   170,   171,   173,   174,   175,
+     176,   177,   178,   179,   180,   181,   183,   184,   187,   188,
+     191,   193,   195,   196,   198,   200,   201,   203,   204,   206,
+     207,   209,   211,   212,   214,   215
 };
 #endif
 
@@ -1335,91 +1349,91 @@ yyreduce:
   switch (yyn)
     {
   case 6: /* constdefs: %empty  */
-#line 48 "syntaxAnalyser.y"
+#line 62 "syntaxAnalyser.y"
                                                                                         {printf("constdefs -> empty\n");}
-#line 1341 "syntaxAnalyser.tab.c"
+#line 1355 "syntaxAnalyser.tab.c"
     break;
 
   case 27: /* constant: T_ICONST  */
-#line 74 "syntaxAnalyser.y"
+#line 88 "syntaxAnalyser.y"
                                                                                         {printf("constant-> T_ICONST");}
-#line 1347 "syntaxAnalyser.tab.c"
+#line 1361 "syntaxAnalyser.tab.c"
     break;
 
   case 28: /* constant: T_RCONST  */
-#line 75 "syntaxAnalyser.y"
+#line 89 "syntaxAnalyser.y"
                                                                                         {printf("constant-> T_RCONST");}
-#line 1353 "syntaxAnalyser.tab.c"
+#line 1367 "syntaxAnalyser.tab.c"
     break;
 
   case 29: /* constant: T_BCONST  */
-#line 76 "syntaxAnalyser.y"
+#line 90 "syntaxAnalyser.y"
                                                                                         {printf("constant-> T_BCONST");}
-#line 1359 "syntaxAnalyser.tab.c"
+#line 1373 "syntaxAnalyser.tab.c"
     break;
 
   case 30: /* constant: T_CCONST  */
-#line 77 "syntaxAnalyser.y"
+#line 91 "syntaxAnalyser.y"
                                                                                         {printf("constant-> T_CCONST");}
-#line 1365 "syntaxAnalyser.tab.c"
+#line 1379 "syntaxAnalyser.tab.c"
     break;
 
   case 38: /* typedefs: %empty  */
-#line 89 "syntaxAnalyser.y"
+#line 103 "syntaxAnalyser.y"
                                                                                         {printf("typedefs -> empty\n");}
-#line 1371 "syntaxAnalyser.tab.c"
+#line 1385 "syntaxAnalyser.tab.c"
     break;
 
   case 52: /* limit: T_ICONST  */
-#line 108 "syntaxAnalyser.y"
+#line 122 "syntaxAnalyser.y"
                                                                                         {printf("constant-> T_ICONST");}
-#line 1377 "syntaxAnalyser.tab.c"
+#line 1391 "syntaxAnalyser.tab.c"
     break;
 
   case 53: /* limit: T_CCONST  */
-#line 109 "syntaxAnalyser.y"
+#line 123 "syntaxAnalyser.y"
                                                                                         {printf("constant-> T_CCONST");}
-#line 1383 "syntaxAnalyser.tab.c"
+#line 1397 "syntaxAnalyser.tab.c"
     break;
 
   case 54: /* limit: T_BCONST  */
-#line 110 "syntaxAnalyser.y"
+#line 124 "syntaxAnalyser.y"
                                                                                         {printf("constant-> T_BCONST");}
-#line 1389 "syntaxAnalyser.tab.c"
+#line 1403 "syntaxAnalyser.tab.c"
     break;
 
   case 68: /* vardefs: %empty  */
-#line 130 "syntaxAnalyser.y"
+#line 144 "syntaxAnalyser.y"
                                                                                         {printf("vardefs -> empty\n");}
-#line 1395 "syntaxAnalyser.tab.c"
+#line 1409 "syntaxAnalyser.tab.c"
     break;
 
   case 72: /* subprograms: %empty  */
-#line 136 "syntaxAnalyser.y"
+#line 150 "syntaxAnalyser.y"
                                                                                         {printf("subprograms -> empty\n");}
-#line 1401 "syntaxAnalyser.tab.c"
+#line 1415 "syntaxAnalyser.tab.c"
     break;
 
   case 79: /* formal_parameters: %empty  */
-#line 146 "syntaxAnalyser.y"
+#line 160 "syntaxAnalyser.y"
                                                                                         {printf("formal_parameters -> empty\n");}
-#line 1407 "syntaxAnalyser.tab.c"
+#line 1421 "syntaxAnalyser.tab.c"
     break;
 
   case 83: /* pass: %empty  */
-#line 152 "syntaxAnalyser.y"
+#line 166 "syntaxAnalyser.y"
                                                                                         {printf("pass -> empty\n");}
-#line 1413 "syntaxAnalyser.tab.c"
+#line 1427 "syntaxAnalyser.tab.c"
     break;
 
   case 95: /* statement: %empty  */
-#line 167 "syntaxAnalyser.y"
+#line 181 "syntaxAnalyser.y"
                                                                                         {printf("statement -> empty\n");}
-#line 1419 "syntaxAnalyser.tab.c"
+#line 1433 "syntaxAnalyser.tab.c"
     break;
 
 
-#line 1423 "syntaxAnalyser.tab.c"
+#line 1437 "syntaxAnalyser.tab.c"
 
       default: break;
     }
@@ -1613,7 +1627,43 @@ yyreturn:
   return yyresult;
 }
 
-#line 203 "syntaxAnalyser.y"
+#line 217 "syntaxAnalyser.y"
 
                     
+// Main function that opens the file(given as argument) and reads it until EOF or MAX_ERRORS.
+int main(int argc, char* argv[]){
 
+	if(argc < 2){
+		printf("No file given!");
+		return(0);
+	}
+
+	fd = fopen(argv[1], "r");
+	
+	if(fd == NULL){
+		perror("fopen");
+		return -1;
+	}
+	fd_help = fopen(argv[1], "r");
+	if(fd_help == NULL){
+		perror("fopen");
+		return -1;
+	}
+	
+
+    hashtbl = hashtbl_create(5, NULL);
+    if(hashtbl == NULL){
+        fprintf(stderr, "HASHTBL CREATE ERROR\n");
+        exit(-1);
+    }
+
+	yyparse();
+    
+    hashtbl_destroy(hashtbl);
+
+	fclose(fd);
+	fclose(fd_help);
+
+	return(0);
+
+}

@@ -2,6 +2,21 @@
     #define YYSTYPE double
     #include <stdio.h>
     #include <math.h>
+    #include "hashtbl.h"
+
+
+    HASHTBL *hashtbl;
+    int scope = 0;
+
+    extern FILE* fd;
+	extern FILE* fd_help;
+
+    extern int yylex();
+    // extern FILE *yyin;
+    extern int yylineno;
+
+    void yyerror(char* message);
+
 %}
 
 %union{
@@ -38,28 +53,33 @@
 %left fake
 %%
 
-program             :header declarations subprograms comp_statement T_DOT
+program             :header declarations subprograms                                    {scope++;}
+                    comp_statement                                                      {hashtbl_get(hashtbl, scope);}
+                    T_DOT                                                               {scope--; printf("Program ended with T_DOT.\n");}
                     ;
-header              :T_PROGRAM T_ID T_SEMI
+header              :T_PROGRAM T_ID T_SEMI                                              {hashtbl_insert(hashtbl, $2, NULL, scope); printf("HEADER -> program id semi\n")}
                     ;
-declarations        :constdefs typedefs vardefs
+declarations        :constdefs typedefs vardefs                                         {printf("DECLARATIONS -> constdefs typedefs vardefs\n");}
                     ;
-constdefs           :T_CONST constant_defs T_SEMI
+constdefs           :T_CONST constant_defs T_SEMI                                       {printf("CONSTDEFS -> T_CONST constant_defs T_SEMI\n");}
                     |/*empty*/                                                          {printf("constdefs -> empty\n");}
                     ;
-constant_defs       :constant_defs T_SEMI T_ID T_EQU expression
-                    |T_ID T_EQU expression
+constant_defs       :constant_defs T_SEMI T_ID                                          {hashtbl_insert(hashtbl, $3, NULL, scope); }
+                    T_EQU expression                                                    {printf("CONSTANT_DEFS -> constant_defs T_SEMI T_ID T_EQU expression\n");}
+                    |T_ID                                                               {hashtbl_insert(hashtbl, $1, NULL, scope); }
+                    T_EQU expression                                                    {printf("CONSTANT_DEFS -> T_ID T_EQU expression\n");}             
                     ;
-expression          :expression T_RELOP expression
-                    |expression T_EQU expression
-                    |expression T_INOP expression
-                    |expression T_OROP expression
-                    |expression T_ADDOP expression
-                    |expression T_MULDIVANDOP expression
-                    |T_ADDOP expression
-                    |T_NOTOP expression %prec fake
-                    |variable
-                    |T_ID T_LPAREN expressions T_RPAREN
+expression          :expression T_RELOP expression                                      {printf("EXPRESSION -> expression T_RELOP expression\n");}                                          
+                    |expression T_EQU expression                                        {printf("EXPRESSION -> expression T_EQU expression\n");}             
+                    |expression T_INOP expression                                       {printf("EXPRESSION -> expression T_INOP expression\n");}             
+                    |expression T_OROP expression                                       {printf("EXPRESSION -> expression T_OROP expression\n");}             
+                    |expression T_ADDOP expression                                      {printf("EXPRESSION -> expression T_ADDOP expression\n");}             
+                    |expression T_MULDIVANDOP expression                                {printf("EXPRESSION -> expression T_MULDIVANDOP expression\n");}             
+                    |T_ADDOP expression                                                 {printf("EXPRESSION -> T_ADDOP expression\n");}             
+                    |T_NOTOP expression %prec fake                                      {printf("EXPRESSION -> T_NOTOP expression\n");}             
+                    |variable                                                           {printf("EXPRESSION -> variable\n");}             
+                    |T_ID T_LPAREN                                                      {hashtbl_insert(hashtbl, $1, NULL, scope); }
+                    expressions T_RPAREN                                                {printf("EXPRESSION -> T_LPAREN expression T_RPAREN\n");}             
                     |constant
                     |T_LPAREN expression T_RPAREN
                     |setexpression
@@ -202,4 +222,40 @@ write_item          :expression
                     ;
 %%
                     
+// Main function that opens the file(given as argument) and reads it until EOF or MAX_ERRORS.
+int main(int argc, char* argv[]){
 
+	if(argc < 2){
+		printf("No file given!");
+		return(0);
+	}
+
+	fd = fopen(argv[1], "r");
+	
+	if(fd == NULL){
+		perror("fopen");
+		return -1;
+	}
+	fd_help = fopen(argv[1], "r");
+	if(fd_help == NULL){
+		perror("fopen");
+		return -1;
+	}
+	
+
+    hashtbl = hashtbl_create(5, NULL);
+    if(hashtbl == NULL){
+        fprintf(stderr, "HASHTBL CREATE ERROR\n");
+        exit(-1);
+    }
+
+	yyparse();
+    
+    hashtbl_destroy(hashtbl);
+
+	fclose(fd);
+	fclose(fd_help);
+
+	return(0);
+
+}

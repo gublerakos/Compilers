@@ -715,8 +715,13 @@ char *yytext;
 	#include <string.h>
 	#include <stdlib.h>
 	#include <math.h>
-	#include "tokens.h"
-	
+	#define MAX_SIZE 100
+	#define MAX_ERRORS 5
+	#define MAX_LINE_SIZE 100
+	// #include "tokens.h"
+
+	#include "syntaxAnalyser.tab.h"
+
 	// Flag for EOF. 
 	int eof = 0;
 
@@ -756,7 +761,7 @@ char *yytext;
 
 
 /************* KEYWORD VALUES *************/
-#line 760 "lex.yy.c"
+#line 765 "lex.yy.c"
 
 #define INITIAL 0
 #define COMMENT 1
@@ -976,9 +981,9 @@ YY_DECL
 		}
 
 	{
-#line 73 "lecticalAnalyser.l"
+#line 78 "lecticalAnalyser.l"
 
-#line 982 "lex.yy.c"
+#line 987 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1037,432 +1042,432 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 74 "lecticalAnalyser.l"
+#line 79 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_PROGRAM, lines);
-	                    return T_PROGRAM;}
+	                    yylval.strval = strdup(yytext); return T_PROGRAM;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 76 "lecticalAnalyser.l"
+#line 81 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_PROCEDURE, lines);
-	                    return T_PROCEDURE;}
+	                    yylval.strval = strdup(yytext); return T_PROCEDURE;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 78 "lecticalAnalyser.l"
+#line 83 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_CONST, lines);
-                    	return T_CONST;}
+                    	yylval.strval = strdup(yytext); return T_CONST;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 80 "lecticalAnalyser.l"
+#line 85 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_CHAR, lines);
-	                    return T_CHAR;}
+	                    yylval.strval = strdup(yytext); return T_CHAR;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 82 "lecticalAnalyser.l"
+#line 87 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_ARRAY, lines);
-	                    return T_ARRAY;}
+	                    yylval.strval = strdup(yytext); return T_ARRAY;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 84 "lecticalAnalyser.l"
+#line 89 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_SET, lines);
-	                    return T_SET;}
+	                    yylval.strval = strdup(yytext); return T_SET;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 86 "lecticalAnalyser.l"
+#line 91 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_OF, lines);
-	                    return T_OF;}
+	                    yylval.strval = strdup(yytext); return T_OF;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 89 "lecticalAnalyser.l"
+#line 94 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_RECORD, lines);
-	                    return T_RECORD;}
+	                    yylval.strval = strdup(yytext); return T_RECORD;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 91 "lecticalAnalyser.l"
+#line 96 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_REAL, lines);
-	                    return T_REAL;}
+	                    yylval.strval = strdup(yytext); return T_REAL;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 93 "lecticalAnalyser.l"
+#line 98 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_READ, lines);
-	                    return T_READ;}
+	                    yylval.strval = strdup(yytext); return T_READ;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 95 "lecticalAnalyser.l"
+#line 100 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_VAR, lines);
-	                    return T_VAR;}
+	                    yylval.strval = strdup(yytext); return T_VAR;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 97 "lecticalAnalyser.l"
+#line 102 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_FORWARD, lines);
-	                    return T_FORWARD;}
+	                    yylval.strval = strdup(yytext); return T_FORWARD;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 99 "lecticalAnalyser.l"
+#line 104 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_FOR, lines);
-	                    return T_FOR;}
+	                    yylval.strval = strdup(yytext); return T_FOR;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 101 "lecticalAnalyser.l"
+#line 106 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_FUNCTION, lines);
-	                    return T_FUNCTION;}
+	                    yylval.strval = strdup(yytext); return T_FUNCTION;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 104 "lecticalAnalyser.l"
+#line 109 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_INTEGER, lines);
-                    	return T_INTEGER;}
+                    	yylval.strval = strdup(yytext); return T_INTEGER;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 106 "lecticalAnalyser.l"
+#line 111 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_IF, lines);
-	                    return T_IF;}
+	                    yylval.strval = strdup(yytext); return T_IF;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 108 "lecticalAnalyser.l"
+#line 113 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_BOOLEAN, lines);
-	                    return T_BOOLEAN;}
+	                    yylval.strval = strdup(yytext); return T_BOOLEAN;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 110 "lecticalAnalyser.l"
+#line 115 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_BEGIN, lines);
-	                    return T_BEGIN;}
+	                    yylval.strval = strdup(yytext); return T_BEGIN;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 112 "lecticalAnalyser.l"
+#line 117 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_END, lines);
-	                    return T_END;}
+	                    yylval.strval = strdup(yytext); return T_END;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 114 "lecticalAnalyser.l"
+#line 119 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_ELSE, lines);
-	                    return T_ELSE;}
+	                    yylval.strval = strdup(yytext); return T_ELSE;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 116 "lecticalAnalyser.l"
+#line 121 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_THEN, lines);
-	                    return T_THEN;}
+	                    yylval.strval = strdup(yytext); return T_THEN;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 119 "lecticalAnalyser.l"
+#line 124 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_TO, lines);
-	                    return T_TO;}
+	                    yylval.strval = strdup(yytext); return T_TO;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 121 "lecticalAnalyser.l"
+#line 126 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_TYPE, lines);
-	                    return T_TYPE;}
+	                    yylval.strval = strdup(yytext); return T_TYPE;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 123 "lecticalAnalyser.l"
+#line 128 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_WRITE, lines);
-	                    return T_WRITE;}
+	                    yylval.strval = strdup(yytext); return T_WRITE;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 125 "lecticalAnalyser.l"
+#line 130 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_WHILE, lines);
-	                    return T_WHILE;}
+	                    yylval.strval = strdup(yytext); return T_WHILE;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 127 "lecticalAnalyser.l"
+#line 132 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_WITH, lines);
-	                    return T_WITH;}
+	                    yylval.strval = strdup(yytext); return T_WITH;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 129 "lecticalAnalyser.l"
+#line 134 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_DO, lines);
-	                    return T_DO;}
+	                    yylval.strval = strdup(yytext); return T_DO;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 131 "lecticalAnalyser.l"
+#line 136 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_DOWNTO, lines);
-	                    return T_DOWNTO;}
+	                    yylval.strval = strdup(yytext); return T_DOWNTO;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 134 "lecticalAnalyser.l"
+#line 139 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_BCONST, lines);
-	                    return T_BCONST;}
+	                    yylval.strval = strdup(yytext); return T_BCONST;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 136 "lecticalAnalyser.l"
+#line 141 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_BCONST, lines);
-	                    return T_BCONST;}
+	                    yylval.strval = strdup(yytext); return T_BCONST;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 138 "lecticalAnalyser.l"
+#line 143 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_OROP, lines);
-	                    return T_OROP;}
+	                    yylval.strval = strdup(yytext); return T_OROP;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 140 "lecticalAnalyser.l"
+#line 145 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_NOTOP, lines);
-	                    return T_NOTOP;}
+	                    yylval.strval = strdup(yytext); return T_NOTOP;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 142 "lecticalAnalyser.l"
+#line 147 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_MULDIVANDOP, lines);
-	                    return T_MULDIVANDOP;}
+	                    yylval.strval = strdup(yytext); return T_MULDIVANDOP;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 144 "lecticalAnalyser.l"
+#line 149 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_MULDIVANDOP, lines);
-	                    return T_MULDIVANDOP;}
+	                    yylval.strval = strdup(yytext); return T_MULDIVANDOP;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 146 "lecticalAnalyser.l"
+#line 151 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_MULDIVANDOP, lines);
-	                    return T_MULDIVANDOP;}
+	                    yylval.strval = strdup(yytext); return T_MULDIVANDOP;}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 148 "lecticalAnalyser.l"
+#line 153 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_INOP, lines);
-	                    return T_INOP;}
+	                    yylval.strval = strdup(yytext); return T_INOP;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 151 "lecticalAnalyser.l"
+#line 156 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_ID, lines);
-	                    return T_ID;}
+	                    yylval.strval = strdup(yytext); return T_ID;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 153 "lecticalAnalyser.l"
+#line 158 "lecticalAnalyser.l"
 {printf("yytext = %s => %d and token = %d in line %d\n", yytext, dec_to_int(yytext) , T_ICONST, lines);
-	                    return T_ICONST;}
+	                    yylval.intval = dec_to_int(yytext); return T_ICONST;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 155 "lecticalAnalyser.l"
+#line 160 "lecticalAnalyser.l"
 {printf("yytext = %s => %d and token = %d in line %d\n", yytext, bin_to_int(yytext) , T_ICONST, lines);
-	                    return T_ICONST;}
+	                    yylval.intval = bin_to_int(yytext); return T_ICONST;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 157 "lecticalAnalyser.l"
+#line 162 "lecticalAnalyser.l"
 {printf("yytext = %s => %d and token = %d in line %d\n", yytext, hex_to_int(yytext) , T_ICONST, lines);
-	                    return T_ICONST;}
+	                    yylval.intval = hex_to_int(yytext); return T_ICONST;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 159 "lecticalAnalyser.l"
+#line 164 "lecticalAnalyser.l"
 {printf("yytext = %s => %lf and token = %d in line %d\n", yytext, dec_to_real(yytext), T_RCONST, lines);
-	                    return T_RCONST;}
+	                    yylval.doubleval = dec_to_real(yytext); return T_RCONST;}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 161 "lecticalAnalyser.l"
+#line 166 "lecticalAnalyser.l"
 {printf("yytext = %s =>% lf and token = %d in line %d\n", yytext, dec_to_real(yytext), T_RCONST, lines);
-	                    return T_RCONST;}
+	                    yylval.doubleval = dec_to_real(yytext); return T_RCONST;}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 163 "lecticalAnalyser.l"
+#line 168 "lecticalAnalyser.l"
 {printf("yytext = %s => %lf and token = %d in line %d\n", yytext, bin_to_real(yytext), T_RCONST, lines);
-	                    return T_RCONST;}
+	                    yylval.doubleval = bin_to_real(yytext); return T_RCONST;}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 165 "lecticalAnalyser.l"
+#line 170 "lecticalAnalyser.l"
 {printf("yytext = %s => %lf and token = %d in line %d\n", yytext, hex_to_real(yytext), T_RCONST, lines);
-	                    return T_RCONST;}
+	                    yylval.doubleval = hex_to_real(yytext); return T_RCONST;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 167 "lecticalAnalyser.l"
+#line 172 "lecticalAnalyser.l"
 {printf("yytext = %s and token = %d in line %d\n", yytext,   T_CCONST, lines);
-	                    return T_CCONST;}
+	                    yylval.strval = strdup(yytext); return T_CCONST;}
 	YY_BREAK
 /************* OPERATOR VALUES *************/
 case 46:
 YY_RULE_SETUP
-#line 172 "lecticalAnalyser.l"
+#line 177 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_MULDIVANDOP, lines);
-	                    return T_MULDIVANDOP;}
+	                    yylval.strval = strdup(yytext); return T_MULDIVANDOP;}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 175 "lecticalAnalyser.l"
+#line 180 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_RELOP, lines);
-	                    return T_RELOP;}
+	                    yylval.strval = strdup(yytext); return T_RELOP;}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 177 "lecticalAnalyser.l"
+#line 182 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_ADDOP, lines);
-	                    return T_ADDOP;}
+	                    yylval.strval = strdup(yytext); return T_ADDOP;}
 	YY_BREAK
 /************* OTHER VERBAL UNITS VALUES *************/						
 case 49:
 YY_RULE_SETUP
-#line 182 "lecticalAnalyser.l"
+#line 187 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_LPAREN, lines);
-	                    return T_LPAREN;}
+	                    yylval.strval = strdup(yytext); return T_LPAREN;}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 184 "lecticalAnalyser.l"
+#line 189 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_RPAREN, lines);
-	                    return T_RPAREN;}
+	                    yylval.strval = strdup(yytext); return T_RPAREN;}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 186 "lecticalAnalyser.l"
+#line 191 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_SEMI, lines);
-	                    return T_SEMI;}
+	                    yylval.strval = strdup(yytext); return T_SEMI;}
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 188 "lecticalAnalyser.l"
+#line 193 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_DOTDOT, lines);
-                        return T_DOTDOT;}
+                        yylval.strval = strdup(yytext); return T_DOTDOT;}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 190 "lecticalAnalyser.l"
+#line 195 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_DOT, lines);
-	                    return T_DOT;}
+	                    yylval.strval = strdup(yytext); return T_DOT;}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 192 "lecticalAnalyser.l"
+#line 197 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_COMMA, lines);
-	                    return T_COMMA;}
+	                    yylval.strval = strdup(yytext); return T_COMMA;}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 194 "lecticalAnalyser.l"
+#line 199 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_ASSIGN, lines);
-	                    return T_ASSIGN;}
+	                    yylval.strval = strdup(yytext); return T_ASSIGN;}
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 196 "lecticalAnalyser.l"
+#line 201 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_EQU, lines);
-	                    return T_EQU;}
+	                    yylval.strval = strdup(yytext); return T_EQU;}
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 198 "lecticalAnalyser.l"
+#line 203 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_COLON, lines);
-	                    return T_COLON;}
+	                    yylval.strval = strdup(yytext); return T_COLON;}
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 200 "lecticalAnalyser.l"
+#line 205 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_LBRACK, lines);
-	                    return T_LBRACK;}
+	                    yylval.strval = strdup(yytext); return T_LBRACK;}
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 202 "lecticalAnalyser.l"
+#line 207 "lecticalAnalyser.l"
 {printf("yytext = %s  and token = %d in line %d\n", yytext,   T_RBRACK, lines);
-	                    return T_RBRACK;}
+	                    yylval.strval = strdup(yytext); return T_RBRACK;}
 	YY_BREAK
 case 60:
 /* rule 60 can match eol */
 YY_RULE_SETUP
-#line 204 "lecticalAnalyser.l"
+#line 209 "lecticalAnalyser.l"
 {if(!eof){error_line();} lines++;}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 207 "lecticalAnalyser.l"
+#line 212 "lecticalAnalyser.l"
 {printf("EOF FOUND with token = %d in line %d\n", T_EOF, lines);
 	                    return T_EOF;}
 	YY_BREAK
 /************* STATE FOR STRINGS AND SUBCASES *************/
 case 61:
 YY_RULE_SETUP
-#line 211 "lecticalAnalyser.l"
+#line 216 "lecticalAnalyser.l"
 {str_ptr = str_buffer; BEGIN(STRINGS);}
 	YY_BREAK
 case YY_STATE_EOF(STRINGS):
-#line 212 "lecticalAnalyser.l"
+#line 217 "lecticalAnalyser.l"
 {yyerror("Unterminated string"); yyterminate();}
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 213 "lecticalAnalyser.l"
+#line 218 "lecticalAnalyser.l"
 {BEGIN(INITIAL); *str_ptr = '\0'; 
                         printf("String = %s  and token = %d in line %d\n", str_buffer,  T_STRINGS, lines);}
 	YY_BREAK
 case 63:
 /* rule 63 can match eol */
 YY_RULE_SETUP
-#line 215 "lecticalAnalyser.l"
+#line 220 "lecticalAnalyser.l"
 yyerror("Newline in string");
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 216 "lecticalAnalyser.l"
+#line 221 "lecticalAnalyser.l"
 *str_ptr++ = '\n';
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 217 "lecticalAnalyser.l"
+#line 222 "lecticalAnalyser.l"
 *str_ptr++ = '\t';
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 218 "lecticalAnalyser.l"
+#line 223 "lecticalAnalyser.l"
 *str_ptr++ = '\v';
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 219 "lecticalAnalyser.l"
+#line 224 "lecticalAnalyser.l"
 *str_ptr++ = '\f';
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 220 "lecticalAnalyser.l"
+#line 225 "lecticalAnalyser.l"
 *str_ptr++ = '\r';
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 221 "lecticalAnalyser.l"
+#line 226 "lecticalAnalyser.l"
 *str_ptr++ = '\b';
 	YY_BREAK
 case 70:
 /* rule 70 can match eol */
 YY_RULE_SETUP
-#line 222 "lecticalAnalyser.l"
+#line 227 "lecticalAnalyser.l"
 {if(!eof){error_line();} lines++;}
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 224 "lecticalAnalyser.l"
+#line 229 "lecticalAnalyser.l"
 {char *helper = yytext;
 						while(*helper){
 							*str_ptr++ = *helper++;
@@ -1470,51 +1475,51 @@ YY_RULE_SETUP
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 228 "lecticalAnalyser.l"
+#line 233 "lecticalAnalyser.l"
 *str_ptr++ = yytext[1];
 	YY_BREAK
 /************* STATE FOR COMMENTS AND SUBCASES *************/
 case 73:
 YY_RULE_SETUP
-#line 232 "lecticalAnalyser.l"
+#line 237 "lecticalAnalyser.l"
 BEGIN(COMMENT);
 	YY_BREAK
 case YY_STATE_EOF(COMMENT):
-#line 233 "lecticalAnalyser.l"
+#line 238 "lecticalAnalyser.l"
 {yyerror("Unterminated comment"); yyterminate();}
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 234 "lecticalAnalyser.l"
+#line 239 "lecticalAnalyser.l"
 {return T_COMMENT;}
 	YY_BREAK
 case 75:
 /* rule 75 can match eol */
 YY_RULE_SETUP
-#line 235 "lecticalAnalyser.l"
+#line 240 "lecticalAnalyser.l"
 {if(!eof){error_line();} lines++; return T_COMMENT;}
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 237 "lecticalAnalyser.l"
+#line 242 "lecticalAnalyser.l"
 BEGIN(INITIAL);
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 239 "lecticalAnalyser.l"
+#line 244 "lecticalAnalyser.l"
 {}
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 240 "lecticalAnalyser.l"
+#line 245 "lecticalAnalyser.l"
 yyerror("Illegal token");
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 242 "lecticalAnalyser.l"
+#line 247 "lecticalAnalyser.l"
 ECHO;
 	YY_BREAK
-#line 1518 "lex.yy.c"
+#line 1523 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2513,7 +2518,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 242 "lecticalAnalyser.l"
+#line 247 "lecticalAnalyser.l"
 
 
 
@@ -2600,37 +2605,37 @@ double bin_to_real(char* str){
 }
 
 // Main function that opens the file(given as argument) and reads it until EOF or MAX_ERRORS.
-int main(int argc, char* argv[]){
-	int token;
+// int main(int argc, char* argv[]){
+// 	int token;
 
-	if(argc < 2){
-		printf("No file given!");
-		return(0);
-	}
+// 	if(argc < 2){
+// 		printf("No file given!");
+// 		return(0);
+// 	}
 
-	fd = fopen(argv[1], "r");
+// 	fd = fopen(argv[1], "r");
 	
-	if(fd == NULL){
-		perror("fopen");
-		return -1;
-	}
-	fd_help = fopen(argv[1], "r");
-	if(fd_help == NULL){
-		perror("fopen");
-		return -1;
-	}
-	error_line();
-	yyset_in(fd_help);
-	do{	
-	 	token = yylex();
-	} while(token != T_EOF);
+// 	if(fd == NULL){
+// 		perror("fopen");
+// 		return -1;
+// 	}
+// 	fd_help = fopen(argv[1], "r");
+// 	if(fd_help == NULL){
+// 		perror("fopen");
+// 		return -1;
+// 	}
+// 	error_line();
+// 	yyset_in(fd_help);
+// 	do{	
+// 	 	token = yylex();
+// 	} while(token != T_EOF);
     
-	fclose(fd);
-	fclose(fd_help);
-	yyterminate();
+// 	fclose(fd);
+// 	fclose(fd_help);
+// 	yyterminate();
 
 
-	return(0);
-}
+// 	return(0);
+// }
 
 
