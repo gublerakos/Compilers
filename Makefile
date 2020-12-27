@@ -1,4 +1,4 @@
-all: syntaxAnalyser.tab.c lex.yy.c  lecticalAnalyser compiler
+all: syntaxAnalyser.tab.c lex.yy.c compiler
 
 ########################### compiler ###########################
 compiler: lex.yy.c syntaxAnalyser.tab.c hashtbl.o syntaxAnalyser.tab.h

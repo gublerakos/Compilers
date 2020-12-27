@@ -22,19 +22,19 @@
 	int eof = 0;
 
 	// Counter for lines.
-	int lines = 1;
+	extern int lines;
 
 	// Counter for errors. When MAX_ERRORS (= 5) is reached program terminates.
-	int errors = 0;
+	extern int errors;
 
 	// Buffer to store strings.
 	char str_buffer[MAX_SIZE];
 	char *str_ptr;
 
 	// Buffer to store whole input line to print in case of error.
-	char line_buffer[MAX_LINE_SIZE];
+	extern char line_buffer[MAX_LINE_SIZE];
 
-	void yyerror(char* message);
+	extern void yyerror(char* message);
 	
 	// File descriptor to opening file.
 	FILE* fd;
@@ -247,14 +247,14 @@ CCONST \'.\'|\'\\[nfrtv]\'
 %%
 
 // Function to increase number of errors, when found, and print the corresponding line.
-void yyerror(char* message){
-	errors++;
-	printf("(#%d) errors \"%s\" at token  in line (%d): %s\n", errors, message, lines, line_buffer);
-	if(errors == MAX_ERRORS){
-		printf("MAX ERRORS detected!");
-		exit(-1);
-	}
-}
+// void yyerror(char* message){
+// 	errors++;
+// 	printf("(#%d) errors \"%s\" at token  in line (%d): %s\n", errors, message, lines, line_buffer);
+// 	if(errors == MAX_ERRORS){
+// 		printf("MAX ERRORS detected!");
+// 		exit(-1);
+// 	}
+// }
 
 // Function to store most recent line in "line_buffer".
 void error_line(){
