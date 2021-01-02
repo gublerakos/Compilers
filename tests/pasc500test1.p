@@ -1,6 +1,6 @@
 program try_it;
 const g= 0B1011;
-type gar= 1..g;
+type gar= 1..g
      ar= array[gar] of integer;
      re= record
            x1,x2:integer { no comment
@@ -28,8 +28,7 @@ else
    end
 end;
 begin
-a := "jjk\
-kk";
+a := "jjkkk";
 x[s] := c in [ 9+c[3], 0HA18, 100*x[i+j]];
 y[z] := not x and not all(10,x[j]) or (z = k*3e-2);
 c := '\n';

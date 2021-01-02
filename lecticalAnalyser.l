@@ -22,10 +22,10 @@
 	int eof = 0;
 
 	// Counter for lines.
-	extern int lines;
+	int lines = 1;
 
 	// Counter for errors. When MAX_ERRORS (= 5) is reached program terminates.
-	extern int errors;
+	int errors = 0;
 
 	// Buffer to store strings.
 	char str_buffer[MAX_SIZE];
@@ -34,11 +34,11 @@
 	// Buffer to store whole input line to print in case of error.
 	extern char line_buffer[MAX_LINE_SIZE];
 
-	extern void yyerror(char* message);
-	
+	extern void yyerror(const char *message);	
 	// File descriptor to opening file.
-	FILE* fd;
-	FILE* fd_help;
+	extern FILE* yyin;
+	extern FILE* yyin2;
+	//FILE* fd_help;
 
 	void error_line();
 
@@ -65,7 +65,7 @@ ICONST 0|[1-9][0-9]*
 BRCONST [0][B][1][01]*\.[01]*
 HRCONST [0][H][A-F0-9]*\.[0-9A-F]*
 RCONST_EXP 0|([1-9][0-9]*)?\.(0|[1-9]+[0-9]*)E(0|[-+]?(0|[1-9]+[0-9]*))|(0|[1-9][0-9]*)E(0|[-+]?(0|[1-9]+[0-9]*))
-RCONST_NOEXP 0|[1-9][0-9]*\.0|[1-9]*\.[1-9]+[0-9]*
+RCONST_NOEXP (0|[1-9][0-9]*)\.0|(0|[1-9]*)\.[1-9]+[0-9]*
 
 
 /************* CCONST VALUES *************/
@@ -155,12 +155,6 @@ CCONST \'.\'|\'\\[nfrtv]\'
 
 {ID}					{printf("yytext = %s  and token = %d in line %d\n", yytext,   T_ID, lines);
 	                    yylval.strval = strdup(yytext); return T_ID;}
-{ICONST}				{printf("yytext = %s => %d and token = %d in line %d\n", yytext, dec_to_int(yytext) , T_ICONST, lines);
-	                    yylval.intval = dec_to_int(yytext); return T_ICONST;}
-{BICONST}				{printf("yytext = %s => %d and token = %d in line %d\n", yytext, bin_to_int(yytext) , T_ICONST, lines);
-	                    yylval.intval = bin_to_int(yytext); return T_ICONST;}
-{HICONST}				{printf("yytext = %s => %d and token = %d in line %d\n", yytext, hex_to_int(yytext) , T_ICONST, lines);
-	                    yylval.intval = hex_to_int(yytext); return T_ICONST;}
 {RCONST_EXP}			{printf("yytext = %s => %lf and token = %d in line %d\n", yytext, dec_to_real(yytext), T_RCONST, lines);
 	                    yylval.doubleval = dec_to_real(yytext); return T_RCONST;}
 {RCONST_NOEXP}			{printf("yytext = %s =>% lf and token = %d in line %d\n", yytext, dec_to_real(yytext), T_RCONST, lines);
@@ -169,6 +163,12 @@ CCONST \'.\'|\'\\[nfrtv]\'
 	                    yylval.doubleval = bin_to_real(yytext); return T_RCONST;}
 {HRCONST}				{printf("yytext = %s => %lf and token = %d in line %d\n", yytext, hex_to_real(yytext), T_RCONST, lines);
 	                    yylval.doubleval = hex_to_real(yytext); return T_RCONST;}
+{ICONST}				{printf("yytext = %s => %d and token = %d in line %d\n", yytext, dec_to_int(yytext) , T_ICONST, lines);
+	                    yylval.intval = dec_to_int(yytext); return T_ICONST;}
+{BICONST}				{printf("yytext = %s => %d and token = %d in line %d\n", yytext, bin_to_int(yytext) , T_ICONST, lines);
+	                    yylval.intval = bin_to_int(yytext); return T_ICONST;}
+{HICONST}				{printf("yytext = %s => %d and token = %d in line %d\n", yytext, hex_to_int(yytext) , T_ICONST, lines);
+	                    yylval.intval = hex_to_int(yytext); return T_ICONST;}
 {CCONST}				{printf("yytext = %s and token = %d in line %d\n", yytext,   T_CCONST, lines);
 	                    yylval.strval = strdup(yytext); return T_CCONST;}
 
@@ -208,15 +208,15 @@ CCONST \'.\'|\'\\[nfrtv]\'
 	                    yylval.strval = strdup(yytext); return T_RBRACK;}
 [\n] 					{if(!eof){error_line();} lines++;}
 
-
+	/*
 <INITIAL><<EOF>> 		{printf("EOF FOUND with token = %d in line %d\n", T_EOF, lines);
-	                    return T_EOF;}
+	                    return T_EOF;}*/
 
  /************* STATE FOR STRINGS AND SUBCASES *************/
 \"						{str_ptr = str_buffer; BEGIN(STRINGS);}
 <STRINGS><<EOF>>		{yyerror("Unterminated string"); yyterminate();}
 <STRINGS>\"				{BEGIN(INITIAL); *str_ptr = '\0'; 
-                        printf("String = %s  and token = %d in line %d\n", str_buffer,  T_STRINGS, lines);}
+                        printf("String = %s  and token = %d in line %d\n", str_buffer,  T_STRINGS, lines);return T_STRINGS;}
 <STRINGS>\n		 		yyerror("Newline in string");
 <STRINGS>\\n			*str_ptr++ = '\n';
 <STRINGS>\\t			*str_ptr++ = '\t';
@@ -236,8 +236,8 @@ CCONST \'.\'|\'\\[nfrtv]\'
  /************* STATE FOR COMMENTS AND SUBCASES *************/
 "{"	BEGIN(COMMENT);
 <COMMENT><<EOF>>		{yyerror("Unterminated comment"); yyterminate();}
-<COMMENT>[^}\n]* 		{return T_COMMENT;}
-<COMMENT>\n 			{if(!eof){error_line();} lines++; return T_COMMENT;}
+<COMMENT>[^}\n]* 		{printf("COMMENT FOUND\n");}
+<COMMENT>\n 			{if(!eof){error_line();} lines++;printf("COMMENT FOUND\n");}
 
 <COMMENT>"}"			BEGIN(INITIAL);
 
@@ -267,15 +267,15 @@ void error_line(){
 
 	i = 0;
 	while(1){
-		c = fgetc(fd);
-		if(feof(fd) || c == '\n'){
+		c = fgetc(yyin2);
+		if(feof(yyin2) || c == '\n'){
 			break;
 		}
 		line_buffer[i] = c;
 		i++;
 	}
 
-	if(feof(fd)){
+	if(feof(yyin2)){
 		eof = 1;
 	}
 }
