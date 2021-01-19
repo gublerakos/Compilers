@@ -6,21 +6,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include "hashtbl.h"
+#include "data_types.h"
+#include "ast.h"
 #define MAX_STR_CONST 	200
 #define MAX_LINE_SIZE	200
 #define MAX_ERRORS		5
 
-
 HASHTBL *hashtbl;
-
 
 FILE *yyin2;
 
-// extern void error_string();
-
 extern int yylex();
 extern char *yytext;
-// yyin, giati auto einai to default fd apo opou paei na diavasei h yylex
+//yyin, giati auto einai to default fd apo opou paei na diavasei h yylex
 //gia allo onoma, to yyparse kollaei atermona, giati de ginetai linking me to yylex
 extern FILE *yyin;
 extern void error_line();
@@ -32,15 +30,22 @@ extern int lines;
 extern char string_buf[MAX_STR_CONST];
 extern char *str_ptr;
 int scope = 1;
-// int error_count = 0;
 
 void yyerror(const char *message);
 %}
 %define parse.error verbose
 %union{
+    as_node* astval;
+    s_node* sval;
     int intval;
     double doubleval;
     char* strval;
+    bool boolval;
+    char charval;
+    Type typeval;
+    operators opval;
+    // data_t dataval;
+    List* listval;
 }
 %start program
 
@@ -52,17 +57,27 @@ void yyerror(const char *message);
 %token  <intval> T_ICONST
 %token  <doubleval> T_RCONST 
 
+
+// %type   <strval> header declarations subprograms comp_statement constdefs typedefs vardefs constant_defs expression
+// %type   <strval> variable constant setexpression elexpressions elexpression type_defs type_def dims limits limit
+// %type   <strval> typename standard_type fields field identifiers variable_defs subprogram sub_header formal_parameters
+// %type   <strval> parameter_list pass statements statement assignment if_statement while_statement for_statement
+// %type   <strval> iter_space with_statement subprogram_call io_statement read_list read_item write_list write_item expressions
+
 //  nonterm symbol
-%type   <strval> header declarations subprograms comp_statement constdefs typedefs vardefs constant_defs expression
-%type   <strval> variable constant setexpression elexpressions elexpression type_defs type_def dims limits limit
-%type   <strval> typename standard_type fields field identifiers variable_defs subprogram sub_header formal_parameters
-%type   <strval> parameter_list pass statements statement assignment if_statement while_statement for_statement
-%type   <strval> iter_space with_statement subprogram_call io_statement read_list read_item write_list write_item expressions
+%type   <strval> program header constdefs constant_defs typedefs subprograms subprogram formal_parameters pass 
+%type   <strval> comp_statement iter_space
+%type   <listval> declarations vardefs variable_defs parameter_list statements read_list write_list
+%type   <astval> expression variable expressions constant elexpressions elexpression setexpression limits limit
+%type   <astval> typename identifiers statement assignment if_statement while_statement for_statement read_item 
+%type   <astval> io_statement write_item with_statement subprogram_call if_tail
+%type   <typeval> standard_type
+%type   <sval> type_defs type_def dims fields field sub_header 
 
 // associativity
 %nonassoc LOWER_THAN_ELSE
 %nonassoc T_ELSE
-%nonassoc T_INOP T_RELOP T_EQU // '='
+%nonassoc T_INOP T_RELOP T_EQU
 %left T_ADDOP T_OROP
 %left T_MULDIVANDOP
 %left T_DOT T_LBRACK T_RBRACK T_LPAREN T_RPAREN

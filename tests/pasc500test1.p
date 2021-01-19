@@ -1,6 +1,6 @@
-program try_it;
+program try_it
 const g= 0B1011;
-type gar= 1..g
+type gar= 1..g;
      ar= array[gar] of integer;
      re= record
            x1,x2:integer { no comment
@@ -41,4 +41,4 @@ if z = x then t := t+1;
 if b then t := t+1;
 y := not x[i] or (r.x2 = 0) and (t = tritos);
 write("endofprogram")
-end.
+end

@@ -17,6 +17,7 @@ Retrieved from: http://en.literateprograms.org/Hash_table_(C)?oldid=19638
 
 #include<string.h>
 #include<stdio.h>
+#include "sizes.h"
 
 static char *mystrdup(const char *s)
 {
@@ -71,6 +72,7 @@ void hashtbl_destroy(HASHTBL *hashtbl)
 	free(hashtbl->nodes);
 	free(hashtbl);
 }
+
 
 int hashtbl_insert(HASHTBL *hashtbl, const char *key, void *data ,int scope)
 {
@@ -147,3 +149,171 @@ void *hashtbl_get(HASHTBL *hashtbl, int scope)
 	
 	return NULL;
 }
+
+// NEW FUNCTIONS
+
+
+int hashtbl_lookup(HASHTBL *hashtbl, const char *key, void *data ,int scope){
+	struct hashnode_s *node;
+	hash_size hash=hashtbl->hashfunc(key)%hashtbl->size;
+
+
+	node=hashtbl->nodes[hash];
+	while(node) {
+		if(!strcmp(node->key, key) && (node->scope == scope)) {
+			node->data=data;//an yparxei hdh
+			return 0;
+		}
+		node=node->next;
+	}
+	return 1;
+}
+// HASHTBL INSERT FUNCTION FOR BASIC TYPES.
+// RETURNS 0 ON SUCCESS AND -1 ON FAILURE.
+int basic_insert(HASHTBL *hashtbl, const char *key, int scope, Type type, data_t data){
+	struct hashnode_s *node;
+	hash_size hash=hashtbl->hashfunc(key)%hashtbl->size;
+	// s_node* new_node;
+
+	node=hashtbl->nodes[hash];
+	while(node) {
+		if(!strcmp(node->key, key) && (node->scope == scope)) {
+			node->data=data;
+			return 0;
+		}
+		node=node->next;
+	}
+
+	if(!(node=malloc(sizeof(struct hashnode_s)))) return -1;
+
+	node->hs_node = (s_node*)malloc(sizeof(s_node));
+    if(!node->hs_node){
+        perror("malloc");
+    }
+
+	if(!(node->key=mystrdup(key))) {
+		free(node);
+		return -1;
+	}
+
+	// node->hs_node = new_node;
+	node->hs_node->node_type = type;
+	node->hs_node->data = data;
+    node->hs_node->next = NULL;
+
+	switch (type){
+		case INTEGER:
+			node->hs_node->size = INT_SIZE; 
+			break;
+		case BOOLEAN:
+			node->hs_node->size = BOOL_SIZE;
+			break;
+		case REAL:
+			node->hs_node->size = REAL_SIZE;
+			break;
+		case CHAR:
+			node->hs_node->size = CHAR_SIZE; 
+			break;
+		case STRING:
+			node->hs_node->size = CHAR_SIZE*strlen(data.str_data); 
+			break;
+		default:
+			break;
+	}
+
+	node->scope = scope;
+	node->next=hashtbl->nodes[hash];
+	hashtbl->nodes[hash]=node;
+
+	printf("\t\t\t\t\tBASIC_INSERT(): KEY = %s, HASH = %ld, SCOPE = %d, SIZE = %d\n", key, hash, scope, node->hs_node->size);
+
+	switch (type){
+		case INTEGER:
+			printf("Type = INTEGER, Data = %d\n", data.int_data);
+			break;
+		case BOOLEAN:
+			printf("Type = BOOLEAN, Data = %d\n", data.boolean_data);
+			break;
+		case REAL:
+			printf("Type = REAL, Data = %.3lf\n", data.real_data);
+			break;
+		case CHAR:
+			printf("Type = CHAR, Data = %c\n", data.char_data);
+			break;
+		case STRING:
+			printf("Type = STRING, Data = %s\n", data.str_data);
+			break;
+		default:
+			break;
+	}
+	return 0;
+}
+
+int complex_insert(HASHTBL *hashtbl, const char *key, int scope, s_node* cnode){
+	struct hashnode_s *node;
+	hash_size hash=hashtbl->hashfunc(key)%hashtbl->size;
+
+
+	node=hashtbl->nodes[hash];
+	while(node) {
+		if(!strcmp(node->key, key) && (node->scope == scope)) {
+			node->data=data;
+			return 0;
+		}
+		node=node->next;
+	}
+
+	if(!(node=malloc(sizeof(struct hashnode_s)))) return -1;
+	if(!(node->key=mystrdup(key))) {
+		free(node);
+		return -1;
+	}
+
+	node->hs_node = (s_node*)malloc(sizeof(s_node));
+    if(!node->hs_node){
+        perror("malloc");
+    }
+
+	node->hs_node = cnode;
+
+	switch (cnode->node_type){
+		case ARRAY:
+			printf("Type = ARRAY\n");
+			break;
+		case RECORD:
+			printf("Type = RECORD\n");
+			break;
+		case SET:
+			printf("Type = SET\n");
+			break;
+		case FUNCTION_NAME:
+			printf("Type = FUNCTION_NAME\n");
+			break;
+		case PROCEDURE_NAME:
+			printf("Type = PROCEDURE_NAME\n");
+			break
+		case PROGRAM_NAME:
+			printf("Type = PROGRAM_NAME\n");
+			break;
+		case ENUM:
+			printf("Type = ENUM\n");
+			break;
+		case SUBRANGE:
+			printf("Type = SUBRANGE\n");
+			break;
+		default:
+			break;
+	}
+
+	node->data=data;
+	node->scope = scope;
+	node->next=hashtbl->nodes[hash];
+	hashtbl->nodes[hash]=node;
+	printf("\t\t\t\t\tHASHTBL_INSERT(): KEY = %s, HASH = %ld, SCOPE = %d, SIZE = %d\n", key, hash, scope, node->hs_node->size);
+
+
+	return 0;
+}
+
+
+
