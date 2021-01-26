@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "hashtbl.h"
-#include "data_types.h"
-#include "ast.h"
 #define MAX_STR_CONST 	200
 #define MAX_LINE_SIZE	200
 #define MAX_ERRORS		5
@@ -30,26 +28,14 @@ extern int lines;
 extern char string_buf[MAX_STR_CONST];
 extern char *str_ptr;
 int scope = 1;
-s_node* node;
-as_node* temp;
-struct hashnode_s* retval;
-
 
 void yyerror(const char *message);
 %}
 %define parse.error verbose
 %union{
-    as_node* astval;
-    s_node* sval;
     int intval;
     double doubleval;
     char* strval;
-    bool boolval;
-    char charval;
-    Type typeval;
-    operators opval;
-    // data_t dataval;
-    List* listval;
 }
 %start program
 
@@ -61,22 +47,12 @@ void yyerror(const char *message);
 %token  <intval> T_ICONST
 %token  <doubleval> T_RCONST 
 
-
-// %type   <strval> header declarations subprograms comp_statement constdefs typedefs vardefs constant_defs expression
-// %type   <strval> variable constant setexpression elexpressions elexpression type_defs type_def dims limits limit
-// %type   <strval> typename standard_type fields field identifiers variable_defs subprogram sub_header formal_parameters
-// %type   <strval> parameter_list pass statements statement assignment if_statement while_statement for_statement
-// %type   <strval> iter_space with_statement subprogram_call io_statement read_list read_item write_list write_item expressions
-
 //  nonterm symbol
-%type   <strval> program header constdefs constant_defs typedefs subprograms subprogram formal_parameters pass 
-%type   <strval> comp_statement iter_space
-%type   <listval> declarations vardefs variable_defs parameter_list statements read_list write_list
-%type   <astval> expression variable expressions constant elexpressions elexpression setexpression limits limit
-%type   <astval> typename identifiers statement assignment if_statement while_statement for_statement read_item 
-%type   <astval> io_statement write_item with_statement subprogram_call if_tail
-%type   <typeval> standard_type
-%type   <sval> type_defs type_def dims fields field sub_header 
+%type   <strval> header declarations subprograms comp_statement constdefs typedefs vardefs constant_defs expression
+%type   <strval> variable constant setexpression elexpressions elexpression type_defs type_def dims limits limit
+%type   <strval> typename standard_type fields field identifiers variable_defs subprogram sub_header formal_parameters
+%type   <strval> parameter_list pass statements statement assignment if_statement while_statement for_statement
+%type   <strval> iter_space with_statement subprogram_call io_statement read_list read_item write_list write_item expressions
 
 // associativity
 %nonassoc LOWER_THAN_ELSE
@@ -90,10 +66,10 @@ void yyerror(const char *message);
 
 program             :header declarations subprograms                                    
                     comp_statement                                                      {hashtbl_get(hashtbl, scope);}
-                    T_DOT                                                               {scope--;  hashtbl_get(hashtbl, scope);printf("Program ended with T_DOT.\n"); free_ast_tree($5);}
+                    T_DOT                                                               {scope--;  hashtbl_get(hashtbl, scope);printf("Program ended with T_DOT.\n");}
                     ;
-header              :T_PROGRAM T_ID T_SEMI                                              {printf("HEADER -> T_PROGRAM T_ID T_SEMI\n");}
-                    |T_PROGRAM T_ID error                                               {printf("HEADER -> T_PROGRAM T_ID\n"); printf("MISSING SEMI in header!\n"); }
+header              :T_PROGRAM T_ID T_SEMI                                              {printf("HEADER -> T_PROGRAM T_ID T_SEMI\n"); hashtbl_insert(hashtbl, $2, NULL, scope);}
+                    |T_PROGRAM T_ID error                                               {hashtbl_insert(hashtbl, $2, NULL, scope); printf("HEADER -> T_PROGRAM T_ID\n"); printf("MISSING SEMI in header!\n"); }
                     ;
 declarations        :constdefs typedefs vardefs                                         {printf("DECLARATIONS -> constdefs typedefs vardefs\n");}
                     ;
@@ -101,53 +77,40 @@ constdefs           :T_CONST constant_defs T_SEMI                               
                     |T_CONST constant_defs error                                        {printf("CONSTDEFS -> T_CONST constant_defs\n"); printf("MISSING SEMI in constdefs!\n"); }
                     |/*empty*/                                                          {printf("constdefs -> empty\n");}
                     ;
-constant_defs       :constant_defs T_SEMI T_ID                                          {basic_insert(hashtbl, $3, scope, $6->snode->node_type, $6->snode->data);}
+constant_defs       :constant_defs T_SEMI T_ID                                          {hashtbl_insert(hashtbl, $3, NULL, scope); }
                     T_EQU expression                                                    {printf("CONSTANT_DEFS -> constant_defs T_SEMI T_ID T_EQU expression\n");}
-                    |T_ID                                                               {basic_insert(hashtbl, $1, scope, $4->snode->node_type, $4->snode->data);}
+                    |T_ID                                                               {hashtbl_insert(hashtbl, $1, NULL, scope);}
                     T_EQU expression                                                    {printf("CONSTANT_DEFS -> T_ID T_EQU expression\n");}             
-                    |constant_defs error T_ID                                           {printf("MISSING SEMI in constant_defs!\n");}
-                    T_EQU expression                                                    {basic_insert(hashtbl, $3, scope, $6->snode->node_type, $6->snode->data);}
+                    |constant_defs error T_ID T_EQU expression                          {printf("MISSING SEMI in constant_defs!\n"); }
                     ;
-expression          :expression T_RELOP expression                                      {$$ = new_ast_node($1->snode.node_type, $2, $1,$3, $1->snode); 
-                                                                                        printf("EXPRESSION -> expression T_RELOP expression\n";}                                          
-                    |expression T_EQU expression                                        {$$ = new_ast_node($1->snode.node_type, $2, $1,$3, $1->snode); 
-                                                                                        printf("EXPRESSION -> expression T_EQU expression\n");}             
-                    |expression T_INOP expression                                       {$$ = new_ast_node($1->snode.node_type, $2, $1,$3, $1->snode); 
-                                                                                        printf("EXPRESSION -> expression T_INOP expression\n");}             
-                    |expression T_OROP expression                                       {$$ = new_ast_node($1->snode.node_type, $2, $1,$3, $1->snode); 
-                                                                                        printf("EXPRESSION -> expression T_OROP expression\n");}             
-                    |expression T_ADDOP expression                                      {$$ = new_ast_node($1->snode.node_type, $2, $1,$3, $1->snode); 
-                                                                                        printf("EXPRESSION -> expression T_ADDOP expression\n");}             
-                    |expression T_MULDIVANDOP expression                                {$$ = new_ast_node($1->snode.node_type, $2, $1,$3, $1->snode); 
-                                                                                        printf("EXPRESSION -> expression T_MULDIVANDOP expression\n");}             
-                    |T_ADDOP expression                                                 {$$ = new_ast_node($1->snode.node_type, $1, $2, NULL, $2->snode); 
-                                                                                        printf("EXPRESSION -> T_ADDOP expression\n");}             
-                    |T_NOTOP expression %prec fake                                      {$$ = new_ast_node($1->snode.node_type, $1, $2, NULL, $2->snode); 
-                                                                                        printf("EXPRESSION -> T_NOTOP expression\n");}             
-                    |variable                                                           {$$ = new_ast_node($1->snode.node_type, T_ID, $1, NULL, $1->snode);
-                                                                                        printf("EXPRESSION -> variable\n");}             
-                    |T_ID                                                               {retval = hashtbl_lookup(hashtbl, $1, scope); $$ = new_leaf_id_node($1, retval->key);
-                    T_LPAREN expressions T_RPAREN                                       printf("EXPRESSION -> T_LPAREN expressions T_RPAREN\n");}             
-                    |constant                                                           {$$ = new_ast_node($1->snode.node_type, CONST, $1, NULL, $1->snode); 
-                                                                                        printf("EXPRESSION -> constant\n");}
-                    |T_LPAREN expression T_RPAREN                                       {$$ = $2; printf("EXPRESSION -> T_LPAREN expression T_RPAREN\n");}  
-                    |setexpression                                                      {new_ast_node($1->snode.node_type, $2, $1,$3); 
-                                                                                        printf("EXPRESSION -> setexpression\n");}
-                    |T_LPAREN expression error                                          {$$ = $2; printf("EXPRESSION -> T_LPAREN expression\n"); printf("MISSING RPAREN in expression!\n");}           
+expression          :expression T_RELOP expression                                      {printf("EXPRESSION -> expression T_RELOP expression\n");}                                          
+                    |expression T_EQU expression                                        {printf("EXPRESSION -> expression T_EQU expression\n");}             
+                    |expression T_INOP expression                                       {printf("EXPRESSION -> expression T_INOP expression\n");}             
+                    |expression T_OROP expression                                       {printf("EXPRESSION -> expression T_OROP expression\n");}             
+                    |expression T_ADDOP expression                                      {printf("EXPRESSION -> expression T_ADDOP expression\n");}             
+                    |expression T_MULDIVANDOP expression                                {printf("EXPRESSION -> expression T_MULDIVANDOP expression\n");}             
+                    |T_ADDOP expression                                                 {printf("EXPRESSION -> T_ADDOP expression\n");}             
+                    |T_NOTOP expression %prec fake                                      {printf("EXPRESSION -> T_NOTOP expression\n");}             
+                    |variable                                                           {printf("EXPRESSION -> variable\n");}             
+                    |T_ID                                                               {hashtbl_insert(hashtbl, $1, NULL, scope); }
+                    T_LPAREN expressions T_RPAREN                                       {printf("EXPRESSION -> T_LPAREN expressions T_RPAREN\n");}             
+                    |constant                                                           {printf("EXPRESSION -> variable\n");}
+                    |T_LPAREN expression T_RPAREN                                       {printf("EXPRESSION -> T_LPAREN expression T_RPAREN\n");}  
+                    |setexpression                                                      {printf("EXPRESSION -> setexpression\n");}
+                    |T_LPAREN expression error                                          {printf("EXPRESSION -> T_LPAREN expression\n"); printf("MISSING RPAREN in expression!\n"); }           
                     ;   
-variable            :T_ID                                                               {retval = hashtbl_lookup(hashtbl, $1, scope); $$ = new_leaf_id_node($1, retval->key);}                        
-                    |variable T_DOT T_ID                                                {$$ = new_ast_node($1->snode.node_type, $2, $1, $3, $1->snode); 
-                                                                                        printf("VARIABLE -> variable T_DOT T_ID\n");}
-                    |variable T_LBRACK expressions T_RBRACK                             {$$ = new_ast_node($1->snode.node_type, ARRAY, $1, $3, $1->snode); printf("VARIABLE -> variable T_LBRACK expressions T_RBRACK\n");}  //ARRAY LOGW VARIABLE KAI BRACKETS
-                    |variable T_LBRACK expressions error                                {$$ = new_ast_node($1->snode.node_type, ARRAY, $1, $3, $1->snode); printf("VARIABLE -> variable T_LBRACK expressions\n"); printf("MISSING RPAREN in variable!\n"); } //ARRAY LOGW VARIABLE KAI BRACKETS
+variable            :T_ID                                                               {hashtbl_insert(hashtbl, $1, NULL, scope); }
+                    |variable T_DOT T_ID                                                {hashtbl_insert(hashtbl, $3, NULL, scope); printf("VARIABLE -> variable T_DOT T_ID\n");}
+                    |variable T_LBRACK expressions T_RBRACK                             {printf("VARIABLE -> variable T_LBRACK expressions T_RBRACK\n");}
+                    |variable T_LBRACK expressions error                                {printf("VARIABLE -> variable T_LBRACK expressions\n"); printf("MISSING RPAREN in variable!\n"); }
                     ;
 expressions         :expressions T_COMMA expression                                     {printf("EXPRESSIONS -> expression T_COMMA expression\n");}
                     |expression                                                         {printf("EXPRESSIONS -> expression\n");}
                     ;
-constant            :T_ICONST                                                           {$$ = leaf_node_const($1); printf("CONSTANT-> T_ICONST\n");}
-                    |T_RCONST                                                           {$$ = leaf_node_const($1); printf("CONSTANT-> T_RCONST\n");}
-                    |T_BCONST                                                           {$$ = leaf_node_const($1); printf("CONSTANT-> T_BCONST\n");}
-                    |T_CCONST                                                           {$$ = leaf_node_const($1); printf("CONSTANT-> T_CCONST\n");}
+constant            :T_ICONST                                                           {printf("CONSTANT-> T_ICONST\n");}
+                    |T_RCONST                                                           {printf("CONSTANT-> T_RCONST\n");}
+                    |T_BCONST                                                           {printf("CONSTANT-> T_BCONST\n");}
+                    |T_CCONST                                                           {printf("CONSTANT-> T_CCONST\n");}
                     ;
 setexpression       :T_LBRACK elexpressions T_RBRACK                                    {printf("SETEXPRESSION -> T_LBRACK elexpressions T_RBRACK\n");}
                     |T_LBRACK error T_RBRACK                                            {printf("SETEXPRESSION -> T_LBRACK T_RBRACK\n"); printf("EMPTY BRACKETS BLOCK in setexpression!\n"); }
@@ -258,7 +221,8 @@ statement           :assignment                                                 
                     ;
 assignment          :variable T_ASSIGN expression                                       {printf("ASSIGNMENT -> variable T_ASSIGN expression\n");}
                     |variable T_ASSIGN T_STRINGS                                        {printf("ASSIGNMENT -> variable T_ASSIGN T_STRINGS\n");}
-                    ;              
+                    ;
+                    
 if_statement        :T_IF expression T_THEN statement if_tail                           {printf("IF_STATEMENT -> T_IF expression T_THEN statement if_tail\n");}
                     |T_IF expression error statement if_tail                            {printf("IF WITHOUT THEN!\n"); }
                     ;
@@ -332,7 +296,7 @@ int main(int argc, char* argv[]){
 	}
 	
 
-    hashtbl = hashtbl_create(5, NULL);
+    hashtbl = hashtbl_create(10, NULL);
     if(hashtbl == NULL){
         fprintf(stderr, "HASHTBL CREATE ERROR\n");
         exit(-1);

@@ -151,22 +151,20 @@ void *hashtbl_get(HASHTBL *hashtbl, int scope)
 }
 
 // NEW FUNCTIONS
-
-
-int hashtbl_lookup(HASHTBL *hashtbl, const char *key, void *data ,int scope){
+struct hashnode_s* hashtbl_lookup(HASHTBL *hashtbl, const char *key, int scope){
 	struct hashnode_s *node;
 	hash_size hash=hashtbl->hashfunc(key)%hashtbl->size;
 
-
 	node=hashtbl->nodes[hash];
-	while(node) {
-		if(!strcmp(node->key, key) && (node->scope == scope)) {
-			node->data=data;//an yparxei hdh
-			return 0;
+	for (int i = scope; i > 0; i--){
+		while (node){
+			if (!strcmp(node->key, key) && (node->scope == i)){
+				return node;
+			}
+			node = node->next;	
 		}
-		node=node->next;
 	}
-	return 1;
+	return NULL;
 }
 // HASHTBL INSERT FUNCTION FOR BASIC TYPES.
 // RETURNS 0 ON SUCCESS AND -1 ON FAILURE.

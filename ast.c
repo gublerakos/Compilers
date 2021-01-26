@@ -8,14 +8,16 @@ void check_malloc(struct ast_node* temp){
     }
 }
 
-as_node* new_ast_node(Type type, operators op, struct ast_node* left,struct ast_node* right){
+as_node* new_ast_node(Type type, char* op, struct ast_node* left,struct ast_node* right, s_node *snode){
     struct ast_node* ast_node;
     
     ast_node = (as_node*)malloc(sizeof (as_node));
     check_malloc(ast_node);
 
-    ast_node->type = type;
-    ast_node->op = op;
+	ast_node->snode = snode;
+	ast_node->type = type;
+	// ast_node->op = op;
+    // ELEGXO GIA CHAR* OP -> ANALOGA ME TO STRING OP VAZW STO ast_node->op TO ANTISTOIXO OPERATOR
     ast_node->left = left;
     ast_node->right = right;
 
@@ -159,7 +161,7 @@ as_node* new_leaf_id_node(s_node* leaf, char* name){
     return (as_node*)ast_node;
 }
 
-as_node* leaf_node_const(data_t value){
+as_node* leaf_node_const(char* value){
     struct leaf_node_const* ast_node;
 
     ast_node = (struct leaf_node_const*)malloc(sizeof (struct leaf_node_const));
@@ -168,7 +170,8 @@ as_node* leaf_node_const(data_t value){
     }
 
     ast_node->op = CONST;
-    ast_node->value = value;
+    // elegxos gia char* value T_CONST klp
+    // ast_node->value = value;
 
     return (as_node*)ast_node;
 }
@@ -268,7 +271,7 @@ void free_ast_tree (as_node* ast_tree){
         break;
     default:
         as_node* df_node = ast_tree;
-
+        free_s_node(df_node->snode);
         if(free_ast_tree(df_node->left)){
             free_ast_tree(df_node->left);
         }

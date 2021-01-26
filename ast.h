@@ -5,6 +5,8 @@ typedef struct ast_node{
     Type type;
     operators op;
 
+    s_node* snode;
+
     struct ast_node* left;
     struct ast_node* right;
 }as_node;
@@ -79,7 +81,7 @@ struct leaf_node_const{
 
 
 // FUNCTIONS
-struct as_node* new_as_node(Type type, operators op, struct ast_node* left,struct ast_node* right);
+struct as_node* new_ast_node(Type type, char* op, struct ast_node* left,struct ast_node* right, s_node *snode);
 void check_malloc(struct ast_node* temp);
 as_node* new_ast_func_node(struct ast_node* args, struct ast_node* comp_statements);
 as_node* new_ast_proc_node(struct ast_node* args, struct ast_node* comp_statements);
