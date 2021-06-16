@@ -1,4 +1,4 @@
-# Compilers-Project
+# Compilers-Project (FROZEN)
 
 At the end of this project, a compiler for pasc500 will be ready(or just want to believe so...).
 
